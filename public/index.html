@@ -45,20 +45,27 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
-            const response = await fetch('/highest-bids');
-            const highestBids = await response.json();
-            
-            document.getElementById('highest-room1').textContent = `Highest bid: $${highestBids.room1}`;
-            document.getElementById('highest-room2').textContent = `Highest bid: $${highestBids.room2}`;
-            document.getElementById('highest-room3').textContent = `Highest bid: $${highestBids.room3}`;
-            document.getElementById('highest-room4').textContent = `Highest bid: $${highestBids.room4}`;
-            document.getElementById('highest-room5').textContent = `Highest bid: $${highestBids.room5}`;
+    try {
+        // Fetch and display the highest bids
+        const response = await fetch('/highest-bids');
+        const highestBids = await response.json();
+        
+        document.getElementById('highest-room1').textContent = `Highest bid: $${highestBids.room1}`;
+        document.getElementById('highest-room2').textContent = `Highest bid: $${highestBids.room2}`;
+        document.getElementById('highest-room3').textContent = `Highest bid: $${highestBids.room3}`;
+        document.getElementById('highest-room4').textContent = `Highest bid: $${highestBids.room4}`;
+        document.getElementById('highest-room5').textContent = `Highest bid: $${highestBids.room5}`;
 
-            // Fetch and display the max possible total bid
-            const maxTotalBidResponse = await fetch('/max-total-bid');
-            const maxTotalBidData = await maxTotalBidResponse.json();
-            document.getElementById('max-total-bid').textContent = maxTotalBidData.maxTotalBid;
-        });
+        // Fetch and display the max possible total bid
+        const maxTotalBidResponse = await fetch('/max-total-bid');
+        const maxTotalBidData = await maxTotalBidResponse.json();
+        document.getElementById('max-total-bid').textContent = maxTotalBidData.maxTotalBid;
+
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+});
+
 
         document.getElementById('biddingForm').addEventListener('submit', async function(event) {
             event.preventDefault();
