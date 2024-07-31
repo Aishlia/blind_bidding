@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Bidding</title>
+</head>
+<body>
+    <h1>Bid for Rooms</h1>
+    <form id="biddingForm">
+        <div>
+            <label for="name">Your Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+            <label for="room1">Bid for Room 1:</label>
+            <input type="number" id="room1" name="room1" min="0">
+            <span id="highest-room1" class="highest-bid"></span>
+        </div>
+        <div>
+            <label for="room2">Bid for Room 2:</label>
+            <input type="number" id="room2" name="room2" min="0">
+            <span id="highest-room2" class="highest-bid"></span>
+        </div>
+        <div>
+            <label for="room3">Bid for Room 3:</label>
+            <input type="number" id="room3" name="room3" min="0">
+            <span id="highest-room3" class="highest-bid"></span>
+        </div>
+        <div>
+            <label for="room4">Bid for Room 4:</label>
+            <input type="number" id="room4" name="room4" min="0">
+            <span id="highest-room4" class="highest-bid"></span>
+        </div>
+        <div>
+            <label for="room5">Bid for Room 5:</label>
+            <input type="number" id="room5" name="room5" min="0">
+            <span id="highest-room5" class="highest-bid"></span>
+        </div>
+        <div>
+            <strong>Total Possible Rent: $<span id="total-rent">0</span></strong>
+        </div>
+        <button type="submit">Submit Bids</button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+    const response = await fetch('/highest-bids');
+    const highestBids = await response.json();
+    
+    document.getElementById('highest-room1').textContent = `Highest bid: $${highestBids.room1}`;
+    document.getElementById('highest-room2').textContent = `Highest bid: $${highestBids.room2}`;
+    document.getElementById('highest-room3').textContent = `Highest bid: $${highestBids.room3}`;
+    document.getElementById('highest-room4').textContent = `Highest bid: $${highestBids.room4}`;
+    document.getElementById('highest-room5').textContent = `Highest bid: $${highestBids.room5}`;
+});
+
+document.getElementById('biddingForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+    const formData = new FormData(this);
+    const bids = {};
+
+    formData.forEach((value, key) => {
+        bids[key] = value || 0;
+    });
+
+    const response = await fetch('/submit-bids', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bids)
+    });
+
+    if (response.ok) {
+        alert('Bids submitted successfully!');
+        // Refresh the highest bids after submission
+        const highestBidsResponse = await fetch('/highest-bids');
+        const highestBids = await highestBidsResponse.json();
+        
+        document.getElementById('highest-room1').textContent = `Highest bid: $${highestBids.room1}`;
+        document.getElementById('highest-room2').textContent = `Highest bid: $${highestBids.room2}`;
+        document.getElementById('highest-room3').textContent = `Highest bid: $${highestBids.room3}`;
+        document.getElementById('highest-room4').textContent = `Highest bid: $${highestBids.room4}`;
+        document.getElementById('highest-room5').textContent = `Highest bid: $${highestBids.room5}`;
+    } else {
+        alert('Failed to submit bids.');
+    }
+});
+    </script>
+</body>
+</html>
