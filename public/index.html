@@ -37,56 +37,66 @@
             <input type="number" id="room5" name="room5" min="0">
             <span id="highest-room5" class="highest-bid"></span>
         </div>
-        <div>
-            <strong>Total Possible Rent: $<span id="total-rent">0</span></strong>
-        </div>
         <button type="submit">Submit Bids</button>
     </form>
+    <div>
+        <strong>Max Possible Total Bid: $<span id="max-total-bid"></span></strong>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', async function() {
-    const response = await fetch('/highest-bids');
-    const highestBids = await response.json();
-    
-    document.getElementById('highest-room1').textContent = `Highest bid: $${highestBids.room1}`;
-    document.getElementById('highest-room2').textContent = `Highest bid: $${highestBids.room2}`;
-    document.getElementById('highest-room3').textContent = `Highest bid: $${highestBids.room3}`;
-    document.getElementById('highest-room4').textContent = `Highest bid: $${highestBids.room4}`;
-    document.getElementById('highest-room5').textContent = `Highest bid: $${highestBids.room5}`;
-});
+            const response = await fetch('/highest-bids');
+            const highestBids = await response.json();
+            
+            document.getElementById('highest-room1').textContent = `Highest bid: $${highestBids.room1}`;
+            document.getElementById('highest-room2').textContent = `Highest bid: $${highestBids.room2}`;
+            document.getElementById('highest-room3').textContent = `Highest bid: $${highestBids.room3}`;
+            document.getElementById('highest-room4').textContent = `Highest bid: $${highestBids.room4}`;
+            document.getElementById('highest-room5').textContent = `Highest bid: $${highestBids.room5}`;
 
-document.getElementById('biddingForm').addEventListener('submit', async function(event) {
-    event.preventDefault();
-    const formData = new FormData(this);
-    const bids = {};
+            // Fetch and display the max possible total bid
+            const maxTotalBidResponse = await fetch('/max-total-bid');
+            const maxTotalBidData = await maxTotalBidResponse.json();
+            document.getElementById('max-total-bid').textContent = maxTotalBidData.maxTotalBid;
+        });
 
-    formData.forEach((value, key) => {
-        bids[key] = value || 0;
-    });
+        document.getElementById('biddingForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const bids = {};
 
-    const response = await fetch('/submit-bids', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(bids)
-    });
+            formData.forEach((value, key) => {
+                bids[key] = value || 0;
+            });
 
-    if (response.ok) {
-        alert('Bids submitted successfully!');
-        // Refresh the highest bids after submission
-        const highestBidsResponse = await fetch('/highest-bids');
-        const highestBids = await highestBidsResponse.json();
-        
-        document.getElementById('highest-room1').textContent = `Highest bid: $${highestBids.room1}`;
-        document.getElementById('highest-room2').textContent = `Highest bid: $${highestBids.room2}`;
-        document.getElementById('highest-room3').textContent = `Highest bid: $${highestBids.room3}`;
-        document.getElementById('highest-room4').textContent = `Highest bid: $${highestBids.room4}`;
-        document.getElementById('highest-room5').textContent = `Highest bid: $${highestBids.room5}`;
-    } else {
-        alert('Failed to submit bids.');
-    }
-});
+            const response = await fetch('/submit-bids', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bids)
+            });
+
+            if (response.ok) {
+                alert('Bids submitted successfully!');
+                // Refresh the highest bids after submission
+                const highestBidsResponse = await fetch('/highest-bids');
+                const highestBids = await highestBidsResponse.json();
+                
+                document.getElementById('highest-room1').textContent = `Highest bid: $${highestBids.room1}`;
+                document.getElementById('highest-room2').textContent = `Highest bid: $${highestBids.room2}`;
+                document.getElementById('highest-room3').textContent = `Highest bid: $${highestBids.room3}`;
+                document.getElementById('highest-room4').textContent = `Highest bid: $${highestBids.room4}`;
+                document.getElementById('highest-room5').textContent = `Highest bid: $${highestBids.room5}`;
+
+                // Refresh the max possible total bid
+                const maxTotalBidResponse = await fetch('/max-total-bid');
+                const maxTotalBidData = await maxTotalBidResponse.json();
+                document.getElementById('max-total-bid').textContent = maxTotalBidData.maxTotalBid;
+            } else {
+                alert('Failed to submit bids.');
+            }
+        });
     </script>
 </body>
 </html>

@@ -67,6 +67,56 @@ app.get('/highest-bids', (req, res) => {
     });
 });
 
+app.get('/max-total-bid', (req, res) => {
+    db.all(`SELECT name, room1, room2, room3, room4, room5 FROM bids`, [], (err, rows) => {
+        if (err) {
+            console.error("Failed to retrieve bids.", err);
+            return res.status(500).send("Failed to retrieve bids.");
+        }
+
+        let maxBid = 0;
+        const bidders = rows.map(row => ({
+            name: row.name,
+            bids: [row.room1, row.room2, row.room3, row.room4, row.room5]
+        }));
+
+        // Helper function to generate all permutations of room assignments
+        function* generatePermutations(arr, n = arr.length) {
+            if (n <= 1) yield arr.slice();
+            else for (let i = 0; i < n; i++) {
+                yield* generatePermutations(arr, n - 1);
+                const j = n % 2 ? 0 : i;
+                [arr[n - 1], arr[j]] = [arr[j], arr[n - 1]];
+            }
+        }
+
+        for (const perm of generatePermutations([0, 1, 2, 3, 4])) {
+            let currentBid = 0;
+            const assignedBidders = new Set();
+
+            perm.forEach((room, index) => {
+                let highestBid = 0;
+                let selectedBidder = null;
+                
+                bidders.forEach(bidder => {
+                    if (!assignedBidders.has(bidder.name) && bidder.bids[room] > highestBid) {
+                        highestBid = bidder.bids[room];
+                        selectedBidder = bidder.name;
+                    }
+                });
+
+                if (selectedBidder) {
+                    assignedBidders.add(selectedBidder);
+                    currentBid += highestBid;
+                }
+            });
+
+            maxBid = Math.max(maxBid, currentBid);
+        }
+
+        res.json({ maxTotalBid: maxBid });
+    });
+});
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
